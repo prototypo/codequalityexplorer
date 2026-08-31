@@ -29,7 +29,7 @@ Measures the target codebase against thresholds for cyclomatic complexity (> 10)
 
 ### /quality-improve
 
-Reads `CODE_QUALITY.md` and fixes exactly ONE finding — the top open one. Runs the project's tests; marks the finding `[x]` on success or `[!]` blocked and reverts on failure. Stops for review after each finding.
+Reads `CODE_QUALITY.md` and fixes exactly ONE finding — the top open one. Runs the project's tests; marks the finding `[x]` on success or `[!]` blocked and reverts on failure. Stops for review after each finding. On the first fix of a report it asks whether to create a branch (default `quality-improvements`) and remembers the answer — yes or no — for the rest of that report.
 
 ## Tools
 
