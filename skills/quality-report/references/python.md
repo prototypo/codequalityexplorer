@@ -22,7 +22,10 @@ Run: `ruff check --isolated --select C901,PLR0913,PLR0915,PLR1702,E722 --preview
 
 - `C901` complexity > 10 (backup if radon missing)
 - `PLR0913` more than 5 arguments
-- `PLR0915` more than 50 statements — treat as the function-length metric
+- `PLR0915` more than 50 statements — treat as the function-length metric.
+  PLR0915 counts statements, not physical lines, so it can under-report
+  against our bar; ALSO apply the skill threshold (> 50 physical lines)
+  during the reading pass.
 - `PLR1702` too many nested blocks — treat as nesting > 4 (ruff's default
   trigger is 5 nested blocks, which matches "more than 4")
 - `E722` bare `except:`
