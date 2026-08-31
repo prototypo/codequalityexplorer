@@ -7,6 +7,9 @@
 //! - average_sales / average_refunds: duplicated >= 5-line block.
 //! - legacy_parse: dead (never called) and calls unwrap().
 //! - first_value: calls unwrap() outside test code.
+//! - the `#[allow(clippy::too_many_arguments)]` on build_label and the
+//!   `#[allow(dead_code)]` on legacy_parse are themselves planted, deliberate
+//!   suppressions the skill must see through and report.
 
 /// Iterate the slice, use nested ifs on each value, and push the
 /// transformed number into the output vector.

@@ -45,6 +45,16 @@ Some of these lints are nursery/restriction lints; if a `-W` flag is
 rejected by the installed clippy, drop that flag and cover the metric in
 the reading pass.
 
+### rust-code-analysis-cli — complexity, length, arguments (optional, if present)
+
+Check: `rust-code-analysis-cli --version`
+
+If installed, run: `rust-code-analysis-cli -m -p <src dir> -O json`
+Read the per-function metrics against the skill's thresholds: `cyclomatic`
+(complexity > 10), `loc.sloc` (function length > 50), `nargs` (argument
+count > 5). If absent, the existing clippy + reading-pass path above already
+covers these metrics, so nothing is lost — skip this tool.
+
 ### grep — unwrap/expect backup
 
 If clippy is missing:

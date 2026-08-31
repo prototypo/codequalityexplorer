@@ -18,7 +18,7 @@ Check: `radon --version`
 
 Check: `ruff --version`
 
-Run: `ruff check --isolated --select C901,PLR0913,PLR0915,PLR1702,E722 --preview --output-format json <paths>`
+Run: `ruff check --isolated --select C901,PLR0913,PLR0915,PLR1702,E722,F401 --preview --output-format json <paths>`
 
 - `C901` complexity > 10 (backup if radon missing)
 - `PLR0913` more than 5 arguments
@@ -29,6 +29,8 @@ Run: `ruff check --isolated --select C901,PLR0913,PLR0915,PLR1702,E722 --preview
 - `PLR1702` too many nested blocks — treat as nesting > 4 (ruff's default
   trigger is 5 nested blocks, which matches "more than 4")
 - `E722` bare `except:`
+- `F401` unused import → dead-code finding. The vulture fallback grep below
+  only covers functions, so this is what gives import coverage.
 
 JSON rows have `filename`, `location.row`, `code`, `message`.
 

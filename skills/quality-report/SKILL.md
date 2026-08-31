@@ -20,7 +20,7 @@ in the repo root. This skill changes NO code. It only reads and reports.
 | Dead code (uncalled functions) | any | tool |
 | Error-handling smells | Rust: `unwrap()`/`expect()` outside `#[cfg(test)]`; Python: bare `except:` | tool |
 | File size | > 500 lines | tool |
-| Comment quality | function comment/docstring must say WHAT, not HOW | judgment |
+| Comment quality | for functions longer than 10 lines, comment/docstring must say WHAT, not HOW | judgment |
 | Reusability | duplicated logic that should be one shared function | judgment |
 
 ## Steps
@@ -56,7 +56,10 @@ in the repo root. This skill changes NO code. It only reads and reports.
 5. **Write `CODE_QUALITY.md`** in the target repo root using the template
    below. Rank findings worst first: order by (how far past the threshold,
    how many readers the file likely has — entry points and public APIs
-   first). Give each finding an id Q1, Q2, ... in rank order.
+   first). Give each finding an id Q1, Q2, ... in rank order. If a
+   `CODE_QUALITY.md` already exists, carry forward its `[!]` blocked markers
+   and their notes for findings that still apply; write everything else
+   fresh as `[ ]`.
 
 6. Tell the user: the report path, the top 3 findings in one line each, and
    that `/quality-improve` fixes them one at a time.
