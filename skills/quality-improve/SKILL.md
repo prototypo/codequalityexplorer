@@ -45,8 +45,9 @@ one.
    mid-merge, detached HEAD, etc.), stop and surface git's actual error to
    the user rather than working around it.
    Respect the recorded decision on every later run for this report — never
-   re-ask. A fresh `/quality-report` writes a report without this line, so a
-   new cycle asks again.
+   re-ask the branch choice; the dirty-tree confirmation before switching is
+   a separate safety stop and still applies. A fresh `/quality-report`
+   writes a report without this line, so a new cycle asks again.
 
 4. **Find the test command.** In order: a project-specific command in the
    repo's CLAUDE.md; `pytest` if pyproject.toml/tests/ exist; `cargo test`
