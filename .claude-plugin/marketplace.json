@@ -1,0 +1,12 @@
+{
+  "name": "codequalityexplorer",
+  "owner": {
+    "name": "David Hyland-Wood"
+  },
+  "plugins": [
+    {
+      "name": "codequalityexplorer",
+      "source": "."
+    }
+  ]
+}

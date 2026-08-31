@@ -4,7 +4,20 @@ A Claude Code plugin that measures code quality in Python and Rust codebases and
 
 ## Installation
 
-Drop this directory into your Claude Code plugins folder as a standard plugin directory (`.claude-plugin/plugin.json` + `skills/` layout), then invoke the skills by name in Claude Code.
+**Try it once** (loads for that session only) — start Claude Code in your target repo with:
+
+```bash
+claude --plugin-dir /path/to/codequalityexplorer
+```
+
+**Install it permanently** — inside any Claude Code session:
+
+```
+/plugin marketplace add /path/to/codequalityexplorer
+/plugin install codequalityexplorer@codequalityexplorer
+```
+
+The skills are then available in every session as `/quality-report` and `/quality-improve`.
 
 ## Usage
 
