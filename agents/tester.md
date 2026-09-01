@@ -1,6 +1,6 @@
 ---
 name: tester
-description: Runs the project's test suite and commits the changes when all tests pass and all review gates have been confirmed. Returns PASS or FAIL. Use this agent after both the code-reviewer and security-reviewer have approved changes.
+description: Runs the project's test suite and commits the changes only when all tests pass, both review gates have been confirmed, and the project-manager's brief explicitly says "commit on pass" — otherwise it runs the suite and reports PASS or FAIL without committing. Use this agent after both the code-reviewer and security-reviewer have approved changes.
 model: sonnet
 tools: Read, Bash, Glob, Grep
 ---

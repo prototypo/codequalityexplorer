@@ -29,7 +29,7 @@ Measures the target codebase against thresholds for cyclomatic complexity (> 10)
 
 ### /quality-improve
 
-Reads `CODE_QUALITY.md` and fixes exactly ONE finding — the top open one. Runs the project's tests; marks the finding `[x]` on success or `[!]` blocked and reverts on failure. Stops for review after each finding. On the first fix of a report it asks whether to create a branch (default `quality-improvements`) and remembers the answer — yes or no — for the rest of that report.
+The plugin ships six agents (developer, code-reviewer, security-reviewer, tester, documenter, project-manager); `/quality-improve` reads `CODE_QUALITY.md` and fixes exactly ONE finding — the top open one, using the first four (developer, code-reviewer, security-reviewer, tester) to fix through review gates. Requires the Agent tool. Marks the finding `[x]` on success or `[!]` blocked and reverts on failure. Stops for review after each finding. On the first fix of a report it asks whether to create a branch (default `quality-improvements`) and remembers the answer — yes or no — for the rest of that report.
 
 ## Tools
 
@@ -50,3 +50,5 @@ Verify the skills work: run `python3 test-fixtures/python/bad_code.py` or `cd te
 ## Adding a language
 
 Write `skills/quality-report/references/<lang>.md` naming the tools, exact commands, how to parse their output, and the fallback when each tool is absent. Add the language's marker files to the detection list in `skills/quality-report/SKILL.md`. Nothing else. See `docs/superpowers/specs/2026-08-31-codequalityexplorer-design.md` for the full design rationale.
+
+`.claude/agents` is a symlink to `agents/`, so the plugin and this repo's own local workflow share one copy of the agent files.
