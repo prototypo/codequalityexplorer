@@ -1,5 +1,7 @@
 # codequalityexplorer Implementation Plan
 
+> **Note:** The report template described in Task 4 was superseded in v0.2.0; see `skills/quality-report/SKILL.md` for the current format (Metrics table with Status/Compliance columns, Marginal section, disclaimer).
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Build a Claude Code plugin with two skills — `/quality-report` (measure a code base, write a ranked `CODE_QUALITY.md`) and `/quality-improve` (fix the top open finding, one per invocation).
