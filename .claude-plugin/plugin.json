@@ -1,7 +1,7 @@
 {
   "name": "codequalityexplorer",
   "description": "Code quality reporting and guided improvement for Python and Rust",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "author": {
     "name": "David Hyland-Wood"
   }
