@@ -33,9 +33,13 @@ Reads `CODE_QUALITY.md` and fixes exactly ONE finding — the top open one. Runs
 
 ## Tools
 
-The skills use `radon`, `ruff`, and `vulture` for Python; `cargo clippy` and `cargo check` for Rust when installed. Each tool is optional. When a tool is not installed, the skill falls back to reading and estimating the metric by hand. The report lists which tools were used and which were missing, so you always know what "measured" means.
+The skills use `radon`, `ruff`, and `vulture` for Python; `rust-code-analysis-cli`, `cargo clippy`, and `cargo check` for Rust. When a tool is missing, the skill tells you the install command and asks whether to install it now; only on decline does it fall back to reading and estimating the metric by hand. `rust-code-analysis-cli` is needed for Rust compliance counts (the per-metric 🟢/🟡/🔴 breakdowns), so declining it leaves those counts estimated. The report lists which tools were used and which were missing, so you always know what "measured" means.
+
+For Python, `scripts/function_metrics.py` (stdlib-only, no install needed) measures every function's length, nesting depth, argument count, and comment presence directly via the AST, giving the compliance-count denominator for those metrics.
 
 For Rust, `cargo clippy` and `cargo check` compile the target crate, so point the plugin at code you trust.
+
+The report's Metrics table shows a Status and Compliance column per metric (e.g. `🟡` status with `🟢 41 · 🟡 2 · 🔴 0` compliance counts), a Marginal section listing functions/files close to a threshold with no finding, and a disclaimer paragraph noting which counts are measured versus estimated.
 
 ## Test fixtures
 
