@@ -13,7 +13,7 @@ claude --plugin-dir /path/to/codequalityexplorer
 **Install it permanently** — inside any Claude Code session:
 
 ```
-/plugin marketplace add /path/to/codequalityexplorer
+/plugin marketplace add prototypo/codequalityexplorer
 /plugin install codequalityexplorer@codequalityexplorer
 ```
 
