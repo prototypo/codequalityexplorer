@@ -18,7 +18,7 @@ in the repo root. This skill changes NO code. It only reads and reports.
 | Argument count | > 5 | tool |
 | Code duplication | repeated blocks ≥ 5 lines | tool + judgment |
 | Dead code (uncalled functions) | any | tool |
-| Error-handling smells | Rust: `unwrap()`/`expect()` outside `#[cfg(test)]`; Python: bare `except:` | tool |
+| Error-handling smells | Rust: `unwrap()`/`expect()` outside `#[cfg(test)]`; Python: bare `except:`; JS/TS: empty or swallowing `catch` | tool |
 | File size | > 500 lines | tool |
 | Comment quality | for functions longer than 10 lines, comment/docstring must say WHAT, not HOW | judgment |
 | Reusability | duplicated logic that should be one shared function | judgment |
@@ -28,12 +28,15 @@ in the repo root. This skill changes NO code. It only reads and reports.
 1. **Detect languages.** In the target repo root, check for:
    - Python: `pyproject.toml`, `setup.py`, `requirements.txt`, or any `*.py` files.
    - Rust: `Cargo.toml` or any `*.rs` files.
+   - JavaScript/TypeScript: `package.json`, `tsconfig.json`, or any
+     `*.js`, `*.jsx`, `*.mjs`, `*.cjs`, `*.ts`, `*.tsx` files.
    If no supported language is found, tell the user and STOP. Write no report.
    If a language is present but has no reference file in `references/`, name it
    in the report summary as detected-but-unsupported.
 
 2. **Load the reference file** for each detected language:
-   `references/python.md`, `references/rust.md`. Follow its tool commands.
+   `references/python.md`, `references/rust.md`,
+   `references/javascript.md`. Follow its tool commands.
    For every tool that is not installed, record it in the "Tools missing"
    list.
 
@@ -42,11 +45,17 @@ in the repo root. This skill changes NO code. It only reads and reports.
    install it now:
    - `pip install radon ruff vulture`
    - `cargo install rust-code-analysis-cli`
+   - `npm install --prefix "<skill dir>" --no-save --ignore-scripts eslint@9
+     typescript@6 typescript-eslint@8 jscpd@5` — installs beside the skill,
+     NEVER in the target repo: `npm install` there runs that repo's own
+     dependency install scripts, and the tools must then be invoked by
+     absolute path so the repo cannot substitute its own binaries.
    If the user declines, use the reference file's fallback for that tool
    and mark the affected counts "estimated".
 
 4. **Measure everything, not just violations.** Run the tools per the
-   reference files AND `scripts/function_metrics.py <paths>` to get
+   reference files AND `scripts/function_metrics.py <paths>` (Python) or
+   `scripts/function_metrics.mjs <paths>` (JavaScript/TypeScript) to get
    per-function length, nesting, argument count, and comment-presence
    values for the whole code base. Classify each function/file 🟢/🟡/🔴
    against the thresholds table using the 10% rule: 🟡 = measured value
@@ -68,7 +77,8 @@ in the repo root. This skill changes NO code. It only reads and reports.
    - **Reusability:** blocks of ≥ 5 similar lines appearing in 2+ places,
      or 2+ functions with near-identical bodies. Flag as one finding naming
      all copies and the shared function that should replace them.
-   - Suppressed problems (Python `# noqa`, Rust `#[allow(...)]`) still count:
+   - Suppressed problems (Python `# noqa`, Rust `#[allow(...)]`, JS/TS
+     `// eslint-disable`, `// @ts-ignore`, `// @ts-expect-error`) still count:
      report them, note the suppression.
 
 6. **Write `CODE_QUALITY.md`** in the target repo root using the template

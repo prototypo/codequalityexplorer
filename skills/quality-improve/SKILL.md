@@ -80,7 +80,9 @@ one.
        repos might call, report this back instead of deleting it.
      - Error-handling smells: replace `unwrap()`/`expect()` with `?` or an
        explicit match returning a sensible error; replace bare `except:`
-       with the narrowest exception type the body can actually raise.
+       with the narrowest exception type the body can actually raise; for an
+       empty or swallowing JS/TS `catch`, handle the error narrowly, rethrow
+       it, or log it with an explanation — never silently swallow it.
      - Comment quality: rewrite the comment/docstring to state WHAT the
        function does and why a caller would use it. Delete step-by-step HOW
        narration.
