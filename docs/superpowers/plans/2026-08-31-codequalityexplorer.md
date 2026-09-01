@@ -2,6 +2,8 @@
 
 > **Note:** The report template described in Task 4 was superseded in v0.2.0; see `skills/quality-report/SKILL.md` for the current format (Metrics table with Status/Compliance columns, Marginal section, disclaimer).
 
+> **Note:** The test-command discovery described in Task 5's quality-improve step 3 was extended in v0.4.1 to JavaScript/TypeScript repos (package.json `"test"` script, run via pnpm/yarn/npm per lockfile); see `skills/quality-improve/SKILL.md` step 4 for the current order.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Build a Claude Code plugin with two skills — `/quality-report` (measure a code base, write a ranked `CODE_QUALITY.md`) and `/quality-improve` (fix the top open finding, one per invocation).
