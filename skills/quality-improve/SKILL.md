@@ -51,7 +51,10 @@ one.
 
 4. **Find the test command.** In order: a project-specific command in the
    repo's CLAUDE.md; `pytest` if pyproject.toml/tests/ exist; `cargo test`
-   if Cargo.toml exists. If the repo has NO tests, warn the user that you
+   if Cargo.toml exists; for JS/TS, if package.json has a `"test"` script
+   that is not npm's placeholder (the string "no test specified"), use
+   `pnpm test` if pnpm-lock.yaml exists, `yarn test` if yarn.lock exists,
+   otherwise `npm test`. If the repo has NO tests, warn the user that you
    would be changing code with no safety net, and ask for explicit
    confirmation before continuing.
 
