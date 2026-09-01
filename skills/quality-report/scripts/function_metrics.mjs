@@ -9,25 +9,20 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 const EXTENSIONS = new Set(['.js', '.jsx', '.mjs', '.cjs', '.ts', '.tsx']);
 const EXCLUDE_DIRS = new Set(['node_modules', 'dist', 'build', 'out', 'coverage', '.next']);
 
-// The script ships with the plugin but runs against a user-chosen repo, so the
-// target repo's own typescript wins over the one installed beside the script.
+// Resolved from the install beside the script ONLY: the script runs against an
+// untrusted repo, and importing that repo's node_modules/typescript would
+// execute its code.
 async function loadTypescript() {
   const require = createRequire(import.meta.url);
   const scriptDir = dirname(fileURLToPath(import.meta.url));
-  const candidates = [
-    () => require.resolve('typescript', { paths: [process.cwd()] }),
-    () => require.resolve('typescript', { paths: [scriptDir] }),
-    () => require.resolve('typescript'),
-  ];
-  for (const candidate of candidates) {
-    try {
-      // typescript 7 dropped the JavaScript parser API this script needs, so a
-      // module without createSourceFile counts as not found.
-      const mod = (await import(pathToFileURL(candidate()).href)).default;
-      if (mod?.createSourceFile) return mod;
-    } catch {
-      // this candidate does not resolve here; try the next one
-    }
+  try {
+    // typescript 7 dropped the JavaScript parser API this script needs, so a
+    // module without createSourceFile counts as not found.
+    const resolved = require.resolve('typescript', { paths: [scriptDir] });
+    const mod = (await import(pathToFileURL(resolved).href)).default;
+    if (mod?.createSourceFile) return mod;
+  } catch {
+    // fall through to the install instruction below
   }
   console.error(`error: cannot find a usable 'typescript' package — run \`npm install --prefix ${join(scriptDir, '..')} --no-save --ignore-scripts typescript@6\``);
   process.exit(1);

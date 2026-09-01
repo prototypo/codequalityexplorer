@@ -59,7 +59,7 @@ def test_both_files_produce_one_json_array():
     """Several inputs print a single array, each record tagged with its own file."""
     found = _run_script(BAD_JS, BAD_TS)
     assert {e["file"] for e in found} == {str(BAD_JS), str(BAD_TS)}
-    assert len(found) == 12
+    assert len(found) == 15
 
 
 def test_js_functions_present(js_entries):
@@ -133,13 +133,15 @@ def test_ts_functions_present(ts_entries):
         "totalSales",
         "totalRefunds",
         "swallow",
+        "settlementReport",
+        "fireAndForget",
         "<anonymous>",
     }
 
 
 def test_ts_constructor(ts_entries):
     ctor = _by_name(ts_entries, "constructor")
-    assert ctor["lineno"] == 19
+    assert ctor["lineno"] == 21
     assert ctor["length"] == 8
     assert ctor["args"] == 6
     assert ctor["nesting"] == 0
@@ -148,7 +150,7 @@ def test_ts_constructor(ts_entries):
 
 def test_ts_classify(ts_entries):
     classify = _by_name(ts_entries, "classify")
-    assert classify["lineno"] == 30
+    assert classify["lineno"] == 32
     assert classify["length"] == 24
     assert classify["args"] == 1
     assert classify["nesting"] == 5
@@ -172,6 +174,28 @@ def test_ts_swallow(ts_entries):
     assert swallow["nesting"] == 1
     assert swallow["complexity"] == 2
     assert swallow["has_doc"] is False
+
+
+def test_ts_long_function(ts_entries):
+    """The TS fixture plants a function past the 50-line limit."""
+    report = _by_name(ts_entries, "settlementReport")
+    assert report["lineno"] == 95
+    assert report["length"] == 53
+    assert report["args"] == 2
+    assert report["nesting"] == 1
+    assert report["complexity"] == 2
+    assert report["has_doc"] is True
+
+
+def test_ts_promise_catch_swallow(ts_entries):
+    """`.catch(() => {})` is the promise swallowing form; its arrow is its own record."""
+    fire = _by_name(ts_entries, "fireAndForget")
+    assert fire["lineno"] == 150
+    assert fire["length"] == 3
+    assert fire["complexity"] == 1
+    arrows = [e for e in ts_entries if e["name"] == "<anonymous>" and e["lineno"] == 151]
+    assert len(arrows) == 1
+    assert arrows[0]["args"] == 0
 
 
 def test_else_if_chain_is_a_single_nesting_level(tmp_path):

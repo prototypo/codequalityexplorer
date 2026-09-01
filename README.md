@@ -1,6 +1,6 @@
 # codequalityexplorer
 
-A Claude Code plugin that measures code quality in Python and Rust codebases and helps fix the problems it finds, one at a time.
+A Claude Code plugin that measures code quality in Python, Rust, JavaScript and TypeScript codebases and helps fix the problems it finds, one at a time.
 
 ## Installation
 
@@ -25,7 +25,7 @@ Run `/quality-report` first to measure your target codebase. It reads the code a
 
 ### /quality-report
 
-Measures the target codebase against thresholds for cyclomatic complexity (> 10), function length (> 50 lines), nesting depth (> 4), argument count (> 5), code duplication (blocks ≥ 5 lines), dead code (uncalled functions), error-handling smells (Rust: `unwrap()`/`expect()` outside tests; Python: bare `except:`), file size (> 500 lines), comment quality (docstrings must say WHAT, not HOW), and reusability (duplicated logic that should be one shared function). Writes a ranked `CODE_QUALITY.md` in the target repo root. Never modifies code.
+Measures the target codebase against thresholds for cyclomatic complexity (> 10), function length (> 50 lines), nesting depth (> 4), argument count (> 5), code duplication (blocks ≥ 5 lines), dead code (uncalled functions), error-handling smells (Rust: `unwrap()`/`expect()` outside tests; Python: bare `except:`; JavaScript/TypeScript: empty or swallowing `catch`), file size (> 500 lines), comment quality (docstrings must say WHAT, not HOW), and reusability (duplicated logic that should be one shared function). Writes a ranked `CODE_QUALITY.md` in the target repo root. Never modifies code.
 
 ### /quality-improve
 
@@ -33,9 +33,13 @@ The plugin ships six agents (developer, code-reviewer, security-reviewer, tester
 
 ## Tools
 
-The skills use `radon`, `ruff`, and `vulture` for Python; `rust-code-analysis-cli`, `cargo clippy`, and `cargo check` for Rust. When a tool is missing, the skill tells you the install command and asks whether to install it now; only on decline does it fall back to reading and estimating the metric by hand. `rust-code-analysis-cli` is needed for Rust compliance counts (the per-metric 🟢/🟡/🔴 breakdowns), so declining it leaves those counts estimated. The report lists which tools were used and which were missing, so you always know what "measured" means.
+The skills use `radon`, `ruff`, and `vulture` for Python; `rust-code-analysis-cli`, `cargo clippy`, and `cargo check` for Rust; `eslint` and `jscpd` for JavaScript and TypeScript. When a tool is missing, the skill tells you the install command and asks whether to install it now; only on decline does it fall back to reading and estimating the metric by hand. `rust-code-analysis-cli` is needed for Rust compliance counts (the per-metric 🟢/🟡/🔴 breakdowns), so declining it leaves those counts estimated. The report lists which tools were used and which were missing, so you always know what "measured" means.
 
 For Python, `scripts/function_metrics.py` (stdlib-only, no install needed) measures every function's length, nesting depth, argument count, and comment presence directly via the AST, giving the compliance-count denominator for those metrics.
+
+For JavaScript and TypeScript, `scripts/function_metrics.mjs` does the same — plus complexity — for both languages. It needs Node.js and the `typescript` package as a parser (pinned to `typescript@6`; version 7 dropped the parser API it uses).
+
+The npm tools install beside the skill, never in the target repo: `npm install --prefix "<skill dir>" --no-save --ignore-scripts eslint@9 typescript@6 typescript-eslint@8 jscpd@5`, and are then invoked by absolute path. Installing into the target repo would run that repo's own install scripts, and `npx` would let it substitute its own binaries.
 
 For Rust, `cargo clippy` and `cargo check` compile the target crate, so point the plugin at code you trust.
 
@@ -43,12 +47,12 @@ The report's Metrics table shows a Status and Compliance column per metric (e.g.
 
 ## Test fixtures
 
-`test-fixtures/` holds one deliberately bad file per language with planted problems (high complexity, long functions, deep nesting, many arguments, duplication, dead code, error-handling smells, and poor comments). These files are **intentionally bad** to verify the skills find what they should. Do not use them as examples of good style.
+`test-fixtures/` holds deliberately bad files per language (JavaScript and TypeScript have one each) with planted problems (high complexity, long functions, deep nesting, many arguments, duplication, dead code, error-handling smells, and poor comments). These files are **intentionally bad** to verify the skills find what they should. Do not use them as examples of good style.
 
-Verify the skills work: run `python3 test-fixtures/python/bad_code.py` or `cd test-fixtures/rust && cargo test` to confirm the fixtures self-check, then run `/quality-report` against the fixtures and verify every planted problem appears in the report.
+Verify the skills work: run `python3 test-fixtures/python/bad_code.py` or `cd test-fixtures/rust && cargo test` to confirm the fixtures self-check (the JavaScript/TypeScript fixtures are checked by `python3 -m pytest skills/quality-report/scripts/`), then run `/quality-report` against the fixtures and verify every planted problem appears in the report.
 
 ## Adding a language
 
-Write `skills/quality-report/references/<lang>.md` naming the tools, exact commands, how to parse their output, and the fallback when each tool is absent. Add the language's marker files to the detection list in `skills/quality-report/SKILL.md`. Nothing else. See `docs/superpowers/specs/2026-08-31-codequalityexplorer-design.md` for the full design rationale.
+Write `skills/quality-report/references/<lang>.md` naming the tools, exact commands, how to parse their output, and the fallback when each tool is absent. Add the language's marker files and extensions to the detection list in `skills/quality-report/SKILL.md`. If no tool measures every function in that language, add a `scripts/function_metrics.<ext>` that does — the compliance counts need a denominator covering the whole codebase, not just the violations. Then add a deliberately bad fixture under `test-fixtures/<lang>/` with a planted problem for each per-function metric the script measures (file size is not planted in any existing fixture), and a test that asserts the script finds each one. See `docs/superpowers/specs/2026-08-31-codequalityexplorer-design.md` for the full design rationale.
 
 `.claude/agents` is a symlink to `agents/`, so the plugin and this repo's own local workflow share one copy of the agent files.

@@ -129,10 +129,10 @@ column marks a count made by reading code instead of by a tool.
 
 Comment-quality compliance is denominated over functions longer than 10
 lines only, and is binary (🟢/🔴, no 🟡): does the function have a
-WHAT-comment or not. The presence count comes from `function_metrics.py`'s
-`has_doc` field for every such function in the code base; comment
-*quality* (WHAT vs HOW) is judged only on the step 5 sample, per the
-disclaimer above.
+WHAT-comment or not. The presence count comes from the `has_doc` field of
+`function_metrics.py`/`function_metrics.mjs` for every such function in the
+code base; comment *quality* (WHAT vs HOW) is judged only on the step 5
+sample, per the disclaimer above.
 
 ## Findings (worst first)
 
@@ -166,5 +166,44 @@ in the report.
 
 ## Adding a language
 
-Write `references/<lang>.md` (tools, exact commands, output parsing,
-fallback) and add the language's marker files to step 1. Nothing else.
+Adding JavaScript/TypeScript needed every edit below. Skip one and the
+language is half-wired.
+
+1. Write `references/<lang>.md`: tools, exact commands, output parsing,
+   fallback for each missing tool.
+2. If any of those commands hands a tool its own config file, ship that
+   config under `scripts/`, beside the skill, so the tool and its parser
+   resolve from the skill's own install and never from the scanned repo.
+   Without it the reference documents a command pointing at a file nobody
+   wrote.
+3. Unless a tool already reports every function in the language, write
+   `scripts/function_metrics.<ext>` that does — step 4's compliance counts
+   need a denominator covering the whole code base, not just violations.
+4. Thresholds table: add the language's error-handling smell to the
+   error-handling-smells row, so step 4 has something to classify against.
+5. Step 1: add the language's marker files AND its file extensions to the
+   detection list.
+6. Step 2: add `references/<lang>.md` to the reference-file list.
+7. Step 3: add the install command for the language's tools.
+8. `.gitignore`: if that install command lands the toolchain inside this
+   repo (`npm install --prefix` does; `pip` and `cargo install` are global
+   and do not), ignore what it drops. Otherwise the next commit here carries
+   the whole toolchain.
+9. Step 4: add the run command for the metrics script from item 3. Omit
+   this and the script exists but is never invoked, so the denominator it
+   was written for is still missing.
+10. Step 5: add the language's suppression markers.
+11. Report template: add the metrics script to the comment-quality
+    compliance paragraph.
+12. Add a deliberately bad fixture under `test-fixtures/<lang>/` and a test
+    asserting the script finds each planted problem.
+13. `skills/quality-improve/SKILL.md`: add how to fix the error-handling
+    smell from item 4.
+14. `.claude-plugin/plugin.json`: name the language in the description.
+15. `README.md`: name the language in the one-line description, in the
+    error-handling-smell list of the `/quality-report` paragraph, in the
+    tools sentence, and in the fixtures paragraph and its self-check
+    command; add a paragraph for the metrics script from item 3 and for any
+    install caveat from item 7; and keep README's own shorter "Adding a
+    language" summary from contradicting this list. Nothing else a user
+    reads before installing says the language is supported.

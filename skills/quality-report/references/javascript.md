@@ -32,19 +32,12 @@ ESLint binary wins — arbitrary code execution from a repo this skill only read
 
 ### function_metrics.mjs — complexity, length, nesting, args, comment presence
 
-Check: `node --version`. The script needs the `typescript` npm package; it
-resolves one from the target repo's `node_modules` first, then from the
-install beside the script. A candidate without the JavaScript parser API this
-script uses — version 7 dropped it — is skipped in favour of the next; if no
-candidate is usable the script exits with a one-line error naming a
-`typescript@6` install.
-
-Preferring the target repo's copy is deliberate — parsing a repo with the
-TypeScript version it was written against is the point — but it means the
-script imports and executes code from the untrusted repo whenever that repo
-carries a `node_modules/typescript`. That is the one repo-controlled execution
-path this reference accepts; every other tool here is pinned to the skill's
-own install. Say so if the user would not otherwise run the repo's code.
+Check: `node --version`. The script needs the `typescript` npm package and
+resolves it from the install beside the script ONLY — never from the target
+repo's `node_modules`, which would import and execute code from the repo this
+skill only reads. If nothing usable is found there (version 7 dropped the
+JavaScript parser API this script uses, so it does not count) the script exits
+with a one-line error naming a `typescript@6` install.
 
 Run: `node "<skill dir>/scripts/function_metrics.mjs" <paths>`
 
@@ -58,7 +51,10 @@ nesting depth, argument count, and comment presence.
   assigned to; a callback that has no such name is reported as
   `<anonymous>`.
 - A nested function is measured on its own and excluded from the enclosing
-  function's numbers.
+  function's nesting and complexity — but not from its length: the enclosing
+  function's line span still contains it. `function_metrics.py` applies the
+  same rule to Python nesting and length (it measures no complexity —
+  radon does).
 - A TypeScript explicit `this` parameter is a type annotation, not an
   argument, and is not counted in `args`.
 - An `if`/`else if`/`else` chain counts as ONE nesting level.
@@ -102,7 +98,8 @@ JSON rows: `filePath`, then `messages[]` with `ruleId`, `line`, `message`
 
 - `complexity` > 10, `max-lines-per-function` > 50, `max-params` > 5,
   `max-depth` > 4, `max-lines` > 500 (file size).
-- `no-empty` → the empty-`catch` error-handling smell.
+- `no-empty` → the empty-`catch` error-handling smell. It also flags every
+  other empty block (`if`, `for`, `while`, `try`) — discount those hits.
 - `no-unused-vars` → file-local dead code. Unused *exports* are out of
   scope: an export may be a public API used by another repo.
 - `max-depth` mis-counts `else if` chains and can under-report;
