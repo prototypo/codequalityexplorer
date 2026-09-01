@@ -2,6 +2,7 @@
   "name": "codequalityexplorer",
   "description": "Code quality reporting and guided improvement for Python, Rust, JavaScript and TypeScript",
   "version": "0.4.1",
+  "license": "MIT",
   "author": {
     "name": "David Hyland-Wood"
   }
