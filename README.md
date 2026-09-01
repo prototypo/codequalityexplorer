@@ -1,4 +1,4 @@
-# codequalityexplorer
+# Code Quality Explorer
 
 A Claude Code plugin that measures code quality in Python, Rust, JavaScript and TypeScript codebases and helps fix the problems it finds, one at a time.
 
@@ -7,7 +7,7 @@ A Claude Code plugin that measures code quality in Python, Rust, JavaScript and 
 **Try it once** (loads for that session only) — start Claude Code in your target repo with:
 
 ```bash
-claude --plugin-dir /path/to/codequalityexplorer
+claude --plugin-dir </path/to/>codequalityexplorer
 ```
 
 **Install it permanently** — inside any Claude Code session:
@@ -21,7 +21,16 @@ The skills are then available in every session as `/quality-report` and `/qualit
 
 ## Usage
 
-Run `/quality-report` first to measure your target codebase. It reads the code and writes a ranked `CODE_QUALITY.md` in the target repo root, listing every finding from worst to best. Then run `/quality-improve` repeatedly — each invocation fixes exactly one finding (the top open one), runs the project's tests to prove it works, and marks the finding `[x]` on success or `[!]` blocked and reverts on failure. One finding per invocation, never batched.
+Run `/quality-report` first to measure your target codebase. It reads the code and writes a ranked `CODE_QUALITY.md` in the target repo root, listing every finding from worst to best. Then run `/quality-improve` repeatedly. It will address one finding per invocation. Each invocation fixes exactly one finding, runs the project's tests to prove it works, and marks the finding `[x]` on success or `[!]` blocked and reverts on failure.
+
+The supported languages so far are:
+
+- Rust
+- Python
+- JavaScript
+- TypeScript
+
+Please add an issue if you want additional language support.
 
 ### /quality-report
 
