@@ -54,7 +54,7 @@ For Rust, `cargo clippy` and `cargo check` compile the target crate, so point th
 
 The report's Metrics table shows a Status and Compliance column per metric (e.g. `🟡` status with `🟢 41 · 🟡 2 · 🔴 0` compliance counts), a Marginal section listing functions/files close to a threshold with no finding, and a disclaimer paragraph noting which counts are measured versus estimated.
 
-Subagents come from [Claude Dev Pipeline])https://github.com/prototypo/claude-dev-pipeline).
+Subagents come from [Claude Dev Pipeline](https://github.com/prototypo/claude-dev-pipeline).
 
 ## Test fixtures
 
