@@ -1,3 +1,40 @@
+## Agent routing
+
+The project-manager uses the standard agents by default. The heavy variants run on a larger model and cost more per call, so use them only where these rules say.
+
+### developer-heavy
+
+Use `developer-heavy` instead of `developer` when a task:
+- changes concurrency, locking, transactions, or background job coordination
+- is a refactor that changes behaviour across more than one module or public interface
+- changes authentication, authorisation, session or token handling, or cryptography
+- touches any path listed under "Security-critical paths" below
+- is an escalation (the standard developer failed the same gate twice for the same finding)
+
+Do not use it for large but mechanical changes (renames, boilerplate, CRUD endpoints that follow an existing pattern, test data).
+
+### security-reviewer-heavy
+
+Use `security-reviewer-heavy` instead of `security-reviewer` when the diff:
+- touches any path listed under "Security-critical paths" below, regardless of which developer wrote it
+- adds or changes an endpoint, route, or handler that enforces access control
+- adds or changes cryptography, token generation or verification, or secret handling
+- adds a new third-party dependency that runs at a trust boundary (parsers, auth libraries, crypto libraries)
+
+### Security-critical paths
+
+<!-- Replace with your project's actual paths. -->
+- `src/auth/`
+- `src/permissions/`
+- `src/crypto/`
+- `src/api/middleware/`
+- Any database migration that changes roles, permissions, or tenant isolation
+
+### Limits
+
+- If `developer-heavy` fails the same gate twice for the same finding, stop and report to the user. Do not keep looping.
+- The code-reviewer, tester, and documenter have no heavy variants.
+
 ## Feature workflow (mandatory)
 
 Every request for a new feature MUST run this gate sequence, in
