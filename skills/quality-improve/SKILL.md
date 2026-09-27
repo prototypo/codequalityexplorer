@@ -106,6 +106,15 @@ one.
      reason appended to the finding, and report the findings and test
      output.
 
-8. **Stop and show the user:** the finding fixed (or blocked and why), the
+8. **Report progress as a RATIO, not a count.** A fix changes the
+   denominator — extracting a helper adds a function, splitting a module
+   adds a file — so the count of violations can rise while the code base
+   genuinely improves. Before saying a metric got worse, check whether the
+   denominator moved. Lead with the compliance ratio, and quote the worst
+   value and the standard deviation, which is where the improvement shows.
+   The quality-report skill's "Counts lie when the denominator moves"
+   section has the worked example.
+
+9. **Stop and show the user:** the finding fixed (or blocked and why), the
    diff (`git diff` output for the touched files), and how many open
    findings remain. Do not start the next finding.

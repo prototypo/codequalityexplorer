@@ -57,7 +57,13 @@ in the repo root. This skill changes NO code. It only reads and reports.
    reference files AND `scripts/function_metrics.py <paths>` (Python) or
    `scripts/function_metrics.mjs <paths>` (JavaScript/TypeScript) to get
    per-function length, nesting, argument count, and comment-presence
-   values for the whole code base. Classify each function/file 🟢/🟡/🔴
+   values for the whole code base.
+
+   For every metric with a numeric value — complexity, length, nesting,
+   argument count, file size — also record the **distribution**: the
+   compliance RATIO, the worst value, the median, and the standard
+   deviation. A bare count of violations is not enough; see "Counts lie
+   when the denominator moves" below. Classify each function/file 🟢/🟡/🔴
    against the thresholds table using the 10% rule: 🟡 = measured value
    within 10% below the threshold (e.g. complexity exactly 10, length
    46–50, nesting exactly 4, args exactly 5, file size 451–500). Binary
@@ -97,7 +103,7 @@ in the repo root. This skill changes NO code. It only reads and reports.
 ```markdown
 # Code Quality Report
 
-Generated: <YYYY-MM-DD> by quality-report v0.2.0
+Generated: <YYYY-MM-DD> by quality-report v0.3.0
 
 ## Summary
 
@@ -133,6 +139,55 @@ WHAT-comment or not. The presence count comes from the `has_doc` field of
 `function_metrics.py`/`function_metrics.mjs` for every such function in the
 code base; comment *quality* (WHAT vs HOW) is judged only on the step 5
 sample, per the disclaimer above.
+
+## Distribution
+
+| Metric | Compliance | Worst | Median | Std dev |
+|---|---|---|---|---|
+| Cyclomatic complexity | 95% (41/43) | 14 | 3 | 2.1 |
+| Function length | ... | | | |
+| Nesting depth | ... | | | |
+| Argument count | ... | | | |
+| File size | ... | | | |
+
+One row per numeric metric. **Compliance is the ratio, and it is the
+headline number** — the count of violations is the denominator's shadow,
+not a result.
+
+### Counts lie when the denominator moves
+
+Fixing these findings CHANGES THE DENOMINATOR, almost always upward:
+extracting a helper adds a function, splitting a module adds a file. So a
+raw count of violations can rise while the code base genuinely improves,
+and a reader who watches only the count concludes the work made things
+worse.
+
+A real example, from splitting three oversized files in one code base:
+
+| | before | after |
+|---|---|---|
+| files | 25 | 40 |
+| files over the limit | 12 | 15 |
+| **compliance** | **52%** | **62%** |
+| largest file | 9,888 | 5,721 |
+| mean | 1,493 | 975 |
+| standard deviation | 2,492 | 1,535 |
+| share of all code in an oversized file | 94% | 84% |
+
+The count rose by three and every other measure improved. Judged by count
+alone, the honest conclusion would have been "don't split files" — which
+rewards leaving a monolith alone, the exact opposite of the point.
+
+So when reporting progress against an earlier run:
+
+- **Lead with the compliance ratio**, never the raw count.
+- **Quote the worst value.** One function at complexity 171 matters more
+  than forty at 11, and only the worst value shows that.
+- **Quote the standard deviation.** Falling variance means the outliers
+  are being pulled in, which is what this whole exercise is for.
+- If a count rose, say plainly whether the denominator rose too, and by
+  how much. A count that rose while the ratio improved is progress and
+  should be written up as progress.
 
 ## Findings (worst first)
 
