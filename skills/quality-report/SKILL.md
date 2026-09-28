@@ -27,7 +27,8 @@ in the repo root. This skill changes NO code. It only reads and reports.
 
 | Metric kind | Metrics | 🟢 | 🟡 | 🔴 |
 |---|---|---|---|---|
-| Numeric | complexity, function length, nesting, args, file size | ratio ≥ 95% | ratio ≥ 80% | ratio < 80%, or worst ≥ 2× threshold |
+| Numeric | complexity, function length, nesting, file size | ratio ≥ 95% | ratio ≥ 80% | ratio < 80%, or worst ≥ 5× threshold |
+| Numeric, args | argument count | ratio ≥ 95% | ratio ≥ 90% | ratio < 90%, or worst ≥ 2.5× threshold (> 12 args) |
 | Ratio, no worst value | comment quality | ≥ 95% | ≥ 80% | < 80% |
 | Dead code | ratio of used functions over all functions | ≥ 98% | ≥ 95% | < 95% |
 | Error smells | occurrences per 1,000 lines (total lines = sum of file sizes) | ≤ 0.5 | ≤ 2 | > 2 |
@@ -38,19 +39,25 @@ in the repo root. This skill changes NO code. It only reads and reports.
 threshold — the same number already in the Compliance/Distribution
 columns. A per-item 🟡 (within 10% below the threshold) counts as passing
 in that ratio; only a per-item 🔴 fails it. Check order: 🔴 first (row
-reads 🔴 if the ratio is below 80%, or if the worst value is ≥ 2× the
-threshold, whichever fires), then 🟢 (ratio ≥ 95%), then 🟡 (ratio ≥ 80%).
-Each Status cell carries a short reason, e.g. `🔴 worst 3.1× limit`, `🟡
-88% pass`, `🟢 0.2 / 1k lines`.
+reads 🔴 if the ratio is below its band's floor — 80% for complexity,
+function length, nesting and file size, 90% for argument count — or if
+the worst value is ≥ 5× the threshold (≥ 2.5× for argument count),
+whichever fires), then 🟢 (ratio ≥ 95%), then 🟡 (ratio ≥ the band's
+floor). Each Status cell carries a short reason, e.g. `🔴 worst 5.2×
+limit`, `🟡 88% pass`, `🟢 0.2 / 1k lines`.
 
 Worked example, 200 functions measured for complexity (threshold 10): one
-function at complexity 25 gives a compliance ratio of 199/200 = 99.5%, but
-worst (25) is 2.5× the threshold, so the 🔴 condition fires first → `🔴
-worst 2.5× limit`, even though the ratio alone would read 🟢. Thirty
-functions at complexity 11 (worst 1.1×, well under 2×) give a compliance
-ratio of 170/200 = 85% — between the 80% and 95% bands → `🟡 85% pass`. One
-function at complexity 11 (worst 1.1×) among 200 gives a compliance ratio
-of 199/200 = 99.5% — no 🔴 condition, ratio ≥ 95% → `🟢 99.5% pass`.
+function at complexity 25 gives a compliance ratio of 199/200 = 99.5%, and
+worst (25) is only 2.5× the threshold — well under the 5× 🔴 trigger — so
+the ratio governs → `🟢 99.5% pass`. One function at complexity 50 (5× the
+threshold) among the same 200 still gives a ratio of 199/200 = 99.5%, but
+the worst-value 🔴 condition now fires → `🔴 worst 5× limit`. Thirty
+functions at complexity 11 (worst 1.1×, well under 5×) give a compliance
+ratio of 170/200 = 85% — between the 80% and 95% bands → `🟡 85% pass`.
+
+For argument count (threshold > 5, its own row): 15 of 200 functions at 6
+args give a compliance ratio of 185/200 = 92.5% — between that row's 90%
+and 95% bands → `🟡 92.5% pass`.
 
 ## Steps
 
@@ -139,7 +146,7 @@ of 199/200 = 99.5% — no 🔴 condition, ratio ≥ 95% → `🟢 99.5% pass`.
 ```markdown
 # Code Quality Report
 
-Generated: <YYYY-MM-DD> by quality-report v0.4.0
+Generated: <YYYY-MM-DD> by quality-report v0.4.1
 
 ## Summary
 
