@@ -54,6 +54,70 @@ For Rust, `cargo clippy` and `cargo check` compile the target crate, so point th
 
 The report's Metrics table shows a Status and Compliance column per metric (e.g. `🟢 95% pass` status with `🟢 39 · 🟡 2 · 🔴 2` compliance counts — 🟡 items count as passing, so 41/43 pass), a Marginal section listing functions/files close to a threshold with no finding, and a disclaimer paragraph noting which counts are measured versus estimated. Status reflects the whole row's compliance ratio and worst value against fixed bands, not just the single worst item, and each Status cell carries a short reason.
 
+## What 🟢 🟡 🔴 mean
+
+Two different things carry a colour, and conflating them is the usual
+confusion:
+
+- **An item** — one function, one file — is 🔴 if it is over the threshold,
+  🟡 if it is within 10% below it, 🟢 otherwise. These are what the
+  Compliance column counts and what the findings list.
+- **A row** is scored on the whole distribution, using the bands below. A
+  row can read 🟢 while still containing 🔴 items: the row says the spread
+  is healthy, not that there is nothing to fix.
+
+"Ratio" below means the share of items that pass — and **a 🟡 item counts
+as passing**, so only 🔴 items reduce it.
+
+### Row bands
+
+| Metric | 🟢 | 🟡 | 🔴 |
+|---|---|---|---|
+| Cyclomatic complexity, function length, nesting depth, file size | ratio ≥ 95% | ratio ≥ 80% | ratio < 80%, **or** worst ≥ 5× threshold |
+| Argument count | ratio ≥ 95% | ratio ≥ 90% | ratio < 90%, **or** worst > 12 args (2.5× threshold) |
+| Comment quality | ≥ 95% | ≥ 80% | < 80% |
+| Dead code (used functions ÷ all functions) | ≥ 98% | ≥ 95% | < 95% |
+| Error-handling smells (per 1,000 lines) | ≤ 0.5 | ≤ 2 | > 2 |
+| Code duplication (% of lines duplicated) | < 3% | < 5% | ≥ 5% |
+| Reusability | same as duplication | | |
+
+Argument count has its own band because the metric's natural scale is
+smaller: 5× the complexity threshold is 50 branches, but 5× the argument
+threshold would be 25 parameters, which no real function reaches. Without a
+separate band the row could never go red on its worst value.
+
+**🔴 is checked first.** A row reads 🔴 if either trigger fires — the ratio
+below its floor, or the worst value at or past its multiple — even when the
+other would have said 🟢. Then 🟢 (ratio ≥ 95%), then 🟡.
+
+### Item bands (the 10% rule)
+
+🟡 means a measured value within 10% below its threshold:
+
+| Metric | 🟢 | 🟡 | 🔴 |
+|---|---|---|---|
+| Cyclomatic complexity | ≤ 9 | exactly 10 | > 10 |
+| Function length | ≤ 45 | 46–50 | > 50 |
+| Nesting depth | ≤ 3 | exactly 4 | > 4 |
+| Argument count | ≤ 4 | exactly 5 | > 5 |
+| File size | ≤ 450 | 451–500 | > 500 |
+
+Dead code, error-handling smells, duplication, reusability and comment
+quality have no per-item 🟡 — an item either is or is not.
+
+### Worked examples
+
+200 functions measured for complexity, threshold 10:
+
+| Situation | Ratio | Worst | Row |
+|---|---|---|---|
+| one function at complexity 25 | 99.5% | 2.5× | 🟢 99.5% pass |
+| one function at complexity 50 | 99.5% | **5×** | 🔴 worst 5× limit |
+| thirty functions at complexity 11 | **85%** | 1.1× | 🟡 85% pass |
+
+And for argument count, threshold 5: 15 of 200 functions at 6 arguments
+gives 92.5% — between that row's 90% and 95% bands → 🟡 92.5% pass.
+
 Subagents come from [Claude Dev Pipeline](https://github.com/prototypo/claude-dev-pipeline).
 
 The agents are generic and need adjusting for your own project — its test commands, conventions, and security-critical paths. You can ask Claude to do that for you. For this plugin to work well, give your project a `CLAUDE.md` that follows the sample in [Claude Dev Pipeline](https://github.com/prototypo/claude-dev-pipeline); it tells the agents how to route work (for example, when to use the heavy developer and security-reviewer variants).
