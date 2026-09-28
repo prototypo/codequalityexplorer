@@ -56,6 +56,8 @@ The report's Metrics table shows a Status and Compliance column per metric (e.g.
 
 Subagents come from [Claude Dev Pipeline](https://github.com/prototypo/claude-dev-pipeline).
 
+The agents are generic and need adjusting for your own project — its test commands, conventions, and security-critical paths. You can ask Claude to do that for you. For this plugin to work well, give your project a `CLAUDE.md` that follows the sample in [Claude Dev Pipeline](https://github.com/prototypo/claude-dev-pipeline); it tells the agents how to route work (for example, when to use the heavy developer and security-reviewer variants).
+
 ## Test fixtures
 
 `test-fixtures/` holds deliberately bad files per language (JavaScript and TypeScript have one each) with planted problems (high complexity, long functions, deep nesting, many arguments, duplication, dead code, error-handling smells, and poor comments). These files are **intentionally bad** to verify the skills find what they should. Do not use them as examples of good style.
