@@ -102,4 +102,6 @@ problems and note the suppression in the finding.
 
 Read files with findings plus the largest files. Look for function bodies or
 blocks of ≥ 5 similar lines appearing 2+ times. Pair each duplication
-finding with the shared function that should replace the copies.
+finding with the shared function that should replace the copies. Estimate
+the duplicated-lines percentage over the sampled lines (duplicated lines
+found ÷ lines read in this sample), and mark it "estimated".

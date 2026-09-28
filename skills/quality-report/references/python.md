@@ -79,4 +79,6 @@ denominator for the complexity counts.
 Read files with findings plus the largest files. Look for function bodies or
 blocks of ≥ 5 similar lines appearing 2+ times. This is a judgment metric;
 pair each duplication finding with a reusability recommendation naming the
-shared function to extract.
+shared function to extract. Estimate the duplicated-lines percentage over
+the sampled lines (duplicated lines found ÷ lines read in this sample), and
+mark it "estimated".

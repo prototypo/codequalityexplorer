@@ -52,7 +52,7 @@ The npm tools install beside the skill, never in the target repo: `npm install -
 
 For Rust, `cargo clippy` and `cargo check` compile the target crate, so point the plugin at code you trust.
 
-The report's Metrics table shows a Status and Compliance column per metric (e.g. `🟡` status with `🟢 41 · 🟡 2 · 🔴 0` compliance counts), a Marginal section listing functions/files close to a threshold with no finding, and a disclaimer paragraph noting which counts are measured versus estimated.
+The report's Metrics table shows a Status and Compliance column per metric (e.g. `🟢 95% pass` status with `🟢 39 · 🟡 2 · 🔴 2` compliance counts), a Marginal section listing functions/files close to a threshold with no finding, and a disclaimer paragraph noting which counts are measured versus estimated. Status reflects the whole row's compliance ratio and worst value against fixed bands, not just the single worst item, and each Status cell carries a short reason.
 
 Subagents come from [Claude Dev Pipeline](https://github.com/prototypo/claude-dev-pipeline).
 

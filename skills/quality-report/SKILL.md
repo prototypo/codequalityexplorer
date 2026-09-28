@@ -23,6 +23,35 @@ in the repo root. This skill changes NO code. It only reads and reports.
 | Comment quality | for functions longer than 10 lines, comment/docstring must say WHAT, not HOW | judgment |
 | Reusability | duplicated logic that should be one shared function | judgment |
 
+## Status bands
+
+| Metric kind | Metrics | 🟢 | 🟡 | 🔴 |
+|---|---|---|---|---|
+| Numeric | complexity, function length, nesting, args, file size | ratio ≥ 95% | ratio ≥ 80% | ratio < 80%, or worst ≥ 2× threshold |
+| Ratio, no worst value | comment quality | ≥ 95% | ≥ 80% | < 80% |
+| Dead code | ratio of used functions over all functions | ≥ 98% | ≥ 95% | < 95% |
+| Error smells | occurrences per 1,000 lines (total lines = sum of file sizes) | ≤ 0.5 | ≤ 2 | > 2 |
+| Duplication | % of lines duplicated (JS/TS: jscpd `statistics.total.percentage`; Python/Rust: estimated from the step-5 sample, marked "estimated") | < 3% | < 5% | ≥ 5% |
+| Reusability | same Status and reason as duplication (same copies) | | | |
+
+"Ratio" = share of functions (files, for file size) that pass the
+threshold — the same number already in the Compliance/Distribution
+columns. A per-item 🟡 (within 10% below the threshold) counts as passing
+in that ratio; only a per-item 🔴 fails it. Check order: 🔴 first (row
+reads 🔴 if the ratio is below 80%, or if the worst value is ≥ 2× the
+threshold, whichever fires), then 🟢 (ratio ≥ 95%), then 🟡 (ratio ≥ 80%).
+Each Status cell carries a short reason, e.g. `🔴 worst 3.1× limit`, `🟡
+88% pass`, `🟢 0.2 / 1k lines`.
+
+Worked example, 200 functions measured for complexity (threshold 10): one
+function at complexity 25 gives a compliance ratio of 199/200 = 99.5%, but
+worst (25) is 2.5× the threshold, so the 🔴 condition fires first → `🔴
+worst 2.5× limit`, even though the ratio alone would read 🟢. Thirty
+functions at complexity 11 (worst 1.1×, well under 2×) give a compliance
+ratio of 170/200 = 85% — between the 80% and 95% bands → `🟡 85% pass`. One
+function at complexity 11 (worst 1.1×) among 200 gives a compliance ratio
+of 199/200 = 99.5% — no 🔴 condition, ratio ≥ 95% → `🟢 99.5% pass`.
+
 ## Steps
 
 1. **Detect languages.** In the target repo root, check for:
@@ -66,10 +95,17 @@ in the repo root. This skill changes NO code. It only reads and reports.
    when the denominator moves" below. Classify each function/file 🟢/🟡/🔴
    against the thresholds table using the 10% rule: 🟡 = measured value
    within 10% below the threshold (e.g. complexity exactly 10, length
-   46–50, nesting exactly 4, args exactly 5, file size 451–500). Binary
-   metrics — dead code, error-handling smells, duplication, reusability,
-   comment quality — have no yellow, only 🟢/🔴. Every threshold violation
-   still becomes a finding exactly as before.
+   46–50, nesting exactly 4, args exactly 5, file size 451–500). Each
+   dead-code, error-handling-smell, duplication, reusability, and
+   comment-quality ITEM is 🟢 or 🔴 only, with no per-item 🟡 — but the
+   row's Status uses the Status bands above and can still read 🟡. Every
+   threshold violation still becomes a finding exactly as before.
+
+   Also record: **total lines** (the sum of file sizes, the denominator for
+   the error-smells density), the **dead-function count** over all
+   functions (the denominator for the dead-code ratio), and the
+   **duplicated-lines %** (from jscpd for JS/TS, estimated from the step 5
+   sample for Python/Rust). These feed the Status bands above.
 
 5. **Judgment pass.** Read every file that has a tool finding, plus up to 10
    of the largest remaining source files. Comment *presence* counts
@@ -103,7 +139,7 @@ in the repo root. This skill changes NO code. It only reads and reports.
 ```markdown
 # Code Quality Report
 
-Generated: <YYYY-MM-DD> by quality-report v0.3.0
+Generated: <YYYY-MM-DD> by quality-report v0.4.0
 
 ## Summary
 
@@ -117,15 +153,20 @@ Generated: <YYYY-MM-DD> by quality-report v0.3.0
 
 | Metric | Threshold | Status | Compliance | Source |
 |---|---|---|---|---|
-| Cyclomatic complexity | > 10 | 🟡 | 🟢 41 · 🟡 2 · 🔴 0 | tool |
+| Cyclomatic complexity | > 10 | 🟢 95% pass | 🟢 39 · 🟡 2 · 🔴 2 | tool |
 
-Fill one row per metric from the thresholds table above. Status is the
-worst item in that row: any 🔴 → 🔴; else any 🟡 → 🟡; else 🟢. Compliance
-counts functions for function metrics (complexity, length, nesting, args,
-comment quality), files for file size, occurrences for error-handling
-smells, and duplicate-block groups for duplication/reusability. Binary
-metrics (dead code, error-handling smells, duplication, reusability) have
-no yellow: show `🔴 n` or `🟢 none`, with no denominator.
+Fill one row per metric from the thresholds table above. Status follows
+the Status bands table above, not just the worst item in the row; each
+cell also carries a short reason (see the reason examples in the Status
+bands section above). Compliance counts functions for function metrics
+(complexity, length, nesting, args, comment quality), files for file size,
+occurrences for error-handling smells, and duplicate-block groups for
+reusability. Binary metrics show the number their Status band is judged
+on, not a bare violation count: dead code shows the ratio of used
+functions over all functions (e.g. `🟢 98% (412/420)`), error-handling
+smells show occurrences per 1,000 lines (e.g. `🟡 1.2 / 1k lines`), and
+duplication shows the duplicated-lines % (e.g. `🟢 1.8% (estimated)` for
+Python/Rust, `🟢 1.8%` for JS/TS).
 
 Comment counts are parsed from every function in the code base; comment
 *quality* and the other judgment metrics (reusability, suppressed
@@ -134,8 +175,9 @@ to 10 of the largest remaining source files. "estimated" in the Source
 column marks a count made by reading code instead of by a tool.
 
 Comment-quality compliance is denominated over functions longer than 10
-lines only, and is binary (🟢/🔴, no 🟡): does the function have a
-WHAT-comment or not. The presence count comes from the `has_doc` field of
+lines only; each function is 🟢 or 🔴 only (no per-item 🟡) — does it have a
+WHAT-comment or not — but the row's Status uses the Status bands above and
+can still read 🟡. The presence count comes from the `has_doc` field of
 `function_metrics.py`/`function_metrics.mjs` for every such function in the
 code base; comment *quality* (WHAT vs HOW) is judged only on the step 5
 sample, per the disclaimer above.
@@ -225,7 +267,10 @@ Adding JavaScript/TypeScript needed every edit below. Skip one and the
 language is half-wired.
 
 1. Write `references/<lang>.md`: tools, exact commands, output parsing,
-   fallback for each missing tool.
+   fallback for each missing tool, and how to produce the language's total
+   lines, a dead-function count over all functions, and a duplicated-lines
+   % (tool, or estimated from the step-5 sample) — step 4's Status bands
+   need all three for every language.
 2. If any of those commands hands a tool its own config file, ship that
    config under `scripts/`, beside the skill, so the tool and its parser
    resolve from the skill's own install and never from the scanned repo.
