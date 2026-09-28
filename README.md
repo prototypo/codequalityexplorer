@@ -38,7 +38,7 @@ Measures the target codebase against thresholds for cyclomatic complexity (> 10)
 
 ### /quality-improve
 
-The plugin ships six agents (developer, code-reviewer, security-reviewer, tester, documenter, project-manager); `/quality-improve` reads `CODE_QUALITY.md` and fixes exactly ONE finding — the top open one, using the first four (developer, code-reviewer, security-reviewer, tester) to fix through review gates. Requires the Agent tool. Marks the finding `[x]` on success or `[!]` blocked and reverts on failure. Stops for review after each finding. On the first fix of a report it asks whether to create a branch (default `quality-improvements`) and remembers the answer — yes or no — for the rest of that report.
+The plugin ships eight agents (developer, developer-heavy, code-reviewer, security-reviewer, security-reviewer-heavy, tester, documenter, project-manager); `/quality-improve` reads `CODE_QUALITY.md` and fixes exactly ONE finding — the top open one, using four of them (developer, code-reviewer, security-reviewer, tester) to fix through review gates. Requires the Agent tool. Marks the finding `[x]` on success or `[!]` blocked and reverts on failure. Stops for review after each finding. On the first fix of a report it asks whether to create a branch (default `quality-improvements`) and remembers the answer — yes or no — for the rest of that report.
 
 ## Tools
 
